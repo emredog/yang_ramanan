@@ -7,7 +7,7 @@ function pyra = featpyramid(im, model)
 % first octave halucinates higher resolution data.
 
 sbin      = model.sbin;
-interval  = model.interval;
+interval  = model.interval; 
 padx      = max(model.maxsize(2)-1-1,0);
 pady      = max(model.maxsize(1)-1-1,0);
 sc = 2 ^(1/interval);

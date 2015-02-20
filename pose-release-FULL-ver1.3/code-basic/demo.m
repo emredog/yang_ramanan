@@ -25,28 +25,27 @@ for i = 1:length(imlist)
     clf; imagesc(im); axis image; axis off; drawnow;
     
     [h, w, channels] = size(im);
-    if h == 240
+    if h ~= 480
         
         % call detect function
         tic;
         boxes = detect_fast(im, model, min(model.thresh,-1));
         dettime = toc; % record cpu time
         if isempty(boxes)
-            fprintf('No detection after %.1f seconds\n',dettime);
-            imwrite(im, ['images/result_' imlist(i).name]);
+            fprintf('No detection after %.1f seconds for %s\n',dettime, imlist(i).name);
+            imwrite(im, ['images/result_' imlist(i).name(1:end-4) '.jpg']);
         else
             boxes = nms(boxes, .1); % nonmaximal suppression
             colorset = {'g','g','y','m','m','m','m','y','y','y','r','r','r','r','y','c','c','c','c','y','y','y','b','b','b','b'};
             showboxes(im, boxes(1,:),colorset); % show the best detection
             %showboxes(im, boxes,colorset);  % show all detections
-            fprintf('detection took %.1f seconds\n',dettime);
+            fprintf('detection took %.1f seconds for %s\n',dettime, imlist(i).name);
             %disp('press any key to continue');
-            saveas(gcf, ['images/result_' imlist(i).name] ,'jpg');
+            saveas(gcf, ['images/result_' imlist(i).name(1:end-4) '.jpg'] ,'jpg');
         end
         
         %pause;
-    else
-        % assumption: h=480
+    else % h=480, process it as 4 parts        
         for x = 0:1
             for y = 0:1
                 imCropped = imcrop(im, [x*320 y*240 320 240]);
@@ -63,7 +62,7 @@ for i = 1:length(imlist)
                     colorset = {'g','g','y','m','m','m','m','y','y','y','r','r','r','r','y','c','c','c','c','y','y','y','b','b','b','b'};
                     showboxes(imCropped, boxes(1,:),colorset); % show the best detection
                     %showboxes(im, boxes,colorset);  % show all detections
-                    fprintf('detection took %.1f seconds\n',dettime);
+                    fprintf('detection took %.1f seconds for %s\n',dettime, imlist(i).name);
                     %disp('press any key to continue');
                     saveas(gcf, ['images/result_' imlist(i).name(1:end-4) '_' num2str(y) '-' num2str(x) '.jpg'] ,'jpg');
                 end
