@@ -8,7 +8,7 @@ end
 compile;
 
 % load and display model
-load('PARSE_model');
+load('PARSE_model_modified');
 %visualizemodel(model);
 %disp('model template visualization');
 %disp('press any key to continue');
