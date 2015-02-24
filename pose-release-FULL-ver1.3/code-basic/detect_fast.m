@@ -9,7 +9,10 @@ function boxes = detect_fast(im, model, thresh)
 % Each set of the first 4 columns specify the bounding box for a part
 
 % Compute the feature pyramid and prepare filter
+tic;
 pyra     = featpyramid(im,model);
+pyratime = toc;
+fprintf('Pyramid constructed in %.3f seconds\n',pyratime);
 interval = model.interval;
 levels   = 1:length(pyra.feat);
 
@@ -24,6 +27,7 @@ for rlevel = levels,
     parts    = components{c};
     numparts = length(parts);
 
+    %tic;
     % Local scores
     for k = 1:numparts,
       f     = parts(k).filterid;
@@ -36,13 +40,18 @@ for rlevel = levels,
       end
       parts(k).level = level;
     end
+    %localTime = toc;
+    %fprintf('Local scores for level: %d component %d in %.3f seconds\n',rlevel, c, localTime);
     
+    %tic;
     % Walk from leaves to root of tree, passing message to parent
     for k = numparts:-1:2,
       par = parts(k).parent;
       [msg,parts(k).Ix,parts(k).Iy,parts(k).Ik] = passmsg(parts(k),parts(par));
       parts(par).score = parts(par).score + msg;
     end
+    %passmsgTime = toc;
+    %fprintf('Msg  for level: %d component %d in %.3f seconds\n',rlevel, c, passmsgTime);
 
     % Add bias to root score
     parts(1).score = parts(1).score + parts(1).b;
@@ -135,7 +144,7 @@ function [score,Ix,Iy,Ik] = passmsg(child,parent)
   [score,Ix,Iy,Ix,Ik] = deal(zeros(Ny,Nx,L));
   for l = 1:L
     b = child.b(1,l,:);
-    [score(:,:,l),I] = max(bsxfun(@plus,score0,b),[],3);
+    [score(:,:,l),I] = max(bsxfun(@plus,score0,b),[],3);    
     i = i0 + N*(I-1);
     Ix(:,:,l)    = Ix0(i);
     Iy(:,:,l)    = Iy0(i);

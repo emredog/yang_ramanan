@@ -8,7 +8,7 @@ end
 compile;
 
 % load and display model
-load('PARSE_model_modified');
+load('PARSE_model');
 %visualizemodel(model);
 %disp('model template visualization');
 %disp('press any key to continue');
@@ -32,14 +32,14 @@ for i = 1:length(imlist)
         boxes = detect_fast(im, model, min(model.thresh,-1));
         dettime = toc; % record cpu time
         if isempty(boxes)
-            fprintf('No detection after %.1f seconds for %s\n',dettime, imlist(i).name);
+            fprintf('No detection after %.3f seconds for %s\n',dettime, imlist(i).name);
             imwrite(im, ['images/result_' imlist(i).name(1:end-4) '.jpg']);
         else
             boxes = nms(boxes, .1); % nonmaximal suppression
             colorset = {'g','g','y','m','m','m','m','y','y','y','r','r','r','r','y','c','c','c','c','y','y','y','b','b','b','b'};
             showboxes(im, boxes(1,:),colorset); % show the best detection
             %showboxes(im, boxes,colorset);  % show all detections
-            fprintf('detection took %.1f seconds for %s\n',dettime, imlist(i).name);
+            fprintf('detection took %.3f seconds for %s\n',dettime, imlist(i).name);
             %disp('press any key to continue');
             saveas(gcf, ['images/result_' imlist(i).name(1:end-4) '.jpg'] ,'jpg');
         end
@@ -54,7 +54,7 @@ for i = 1:length(imlist)
                 boxes = detect_fast(imCropped, model, min(model.thresh,-1));
                 dettime = toc; % record cpu time
                 if isempty(boxes)
-                    fprintf('No detection after %.1f seconds\n',dettime);
+                    fprintf('No detection after %.3f seconds\n',dettime);
                     imwrite(imCropped, ['images/result_' imlist(i).name(1:end-4) '_' num2str(y) '-' num2str(x) '.jpg']);
                     %disp('press any key to continue');
                 else
@@ -62,7 +62,7 @@ for i = 1:length(imlist)
                     colorset = {'g','g','y','m','m','m','m','y','y','y','r','r','r','r','y','c','c','c','c','y','y','y','b','b','b','b'};
                     showboxes(imCropped, boxes(1,:),colorset); % show the best detection
                     %showboxes(im, boxes,colorset);  % show all detections
-                    fprintf('detection took %.1f seconds for %s\n',dettime, imlist(i).name);
+                    fprintf('detection took %.3f seconds for %s\n',dettime, imlist(i).name);
                     %disp('press any key to continue');
                     saveas(gcf, ['images/result_' imlist(i).name(1:end-4) '_' num2str(y) '-' num2str(x) '.jpg'] ,'jpg');
                 end
