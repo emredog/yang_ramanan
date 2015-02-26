@@ -136,20 +136,36 @@ function [score,Ix,Iy,Ik] = passmsg(child,parent)
   for k = 1:K
     [score0(:,:,k),Ix0(:,:,k),Iy0(:,:,k)] = shiftdt(child.score(:,:,k), child.w(1,k), child.w(2,k), child.w(3,k), child.w(4,k),child.startx(k),child.starty(k),Nx,Ny,child.step);
   end
+  
+%  csvwrite('inp_score0.csv', score0);
+%  csvwrite('inp_Ix0.csv', Ix0);
+%  csvwrite('inp_Iy0.csv', Iy0);
+%  child_b = child.b;
+%  csvwrite('inp_childB.csv', child_b);
 
   % At each parent location, for each parent mixture 1:L, compute best child mixture 1:K
   L  = length(parent.filterid);
   N  = Nx*Ny;
   i0 = reshape(1:N,Ny,Nx);
   [score,Ix,Iy,Ix,Ik] = deal(zeros(Ny,Nx,L));
+  
   for l = 1:L
     b = child.b(1,l,:);
-    [score(:,:,l),I] = max(bsxfun(@plus,score0,b),[],3);    
+    deletMe = bsxfun(@plus,score0,b);    
+    [score(:,:,l),I] = max(deletMe,[],3);    
     i = i0 + N*(I-1);
     Ix(:,:,l)    = Ix0(i);
     Iy(:,:,l)    = Iy0(i);
     Ik(:,:,l)    = I;
   end
+  
+    
+  fprintf('Rest of passMsg in %.4f seconds\n',time);
+  
+%  csvwrite('out_score.csv', score);
+%  csvwrite('out_Ix.csv', Ix);
+%  csvwrite('out_Iy.csv', Iy);
+%  csvwrite('out_Ik.csv', Ik);
 
 % Backtrack through DP msgs to collect ptrs to part locations
 function box = backtrack(x,y,mix,parts,pyra)
