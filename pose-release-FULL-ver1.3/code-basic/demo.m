@@ -9,7 +9,7 @@ compile;
 
 % load and display model
 % load('PARSE_model_modified2'); %mParse_model_modified2 has interval=2
-load('PARSE_model_modified'); %mParse_model_modified has interval=1
+load('PARSE_model_modified-Ri.mat'); %mParse_model_modified has interval=1
 %visualizemodel(model);
 %disp('model template visualization');
 %disp('press any key to continue');
@@ -38,8 +38,9 @@ for i = 1:length(imlist)
         else
             [boxes, indexOfMax] = nms(boxes, .1); % nonmaximal suppression
             scores = scores(indexOfMax,:);
+            Ri = scores > model.Ri;
             colorset = {'g','g','y','m','m','m','m','y','y','y','r','r','r','r','y','c','c','c','c','y','y','y','b','b','b','b'};
-            showboxes(im, boxes(1,:),colorset, scores); % show the best detection
+            showboxes(im, boxes(1,:),colorset, Ri); % show the best detection
             %showboxes(im, boxes,colorset);  % show all detections
             fprintf('detection took %.3f seconds for %s\n',dettime, imlist(i).name);
             %disp('press any key to continue');
