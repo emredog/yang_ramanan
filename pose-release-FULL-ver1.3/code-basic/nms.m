@@ -1,4 +1,4 @@
-function top = nms(boxes,overlap,numpart)
+function [top, pick] = nms(boxes, overlap,numpart)
 % Non-maximum suppression.
 % Greedily select high-scoring detections and skip detections
 % that are significantly covered by a previously selected detection.
@@ -49,23 +49,25 @@ y2 = [y2 maxY2];
 area = [area rarea];
 
 rootScores = boxes(:,end);
-[vals, I] = sort(rootScores);
+[vals1, I] = sort(rootScores);
+
 pick = [];
 while ~isempty(I)
   last = length(I);
   i = I(last);
   pick = [pick; i];
 
-  xx1 = bsxfun(@max,x1(i,:), x1(I,:));
+  xx1 = bsxfun(@max,x1(i,:), x1(I,:)); %ED - foreach column c, if ( x1(I,c) < x1(i,c) ) then x1(I,c) = x1(i,c) 
   yy1 = bsxfun(@max,y1(i,:), y1(I,:));
   xx2 = bsxfun(@min,x2(i,:), x2(I,:));
   yy2 = bsxfun(@min,y2(i,:), y2(I,:));
 
   w = xx2-xx1+1; w(w<0) = 0;
   h = yy2-yy1+1; h(h<0) = 0;    
-  inter  = w.*h;
+  inter  = w.*h; %ED - calculate all areas
 
-  o = inter ./ repmat(area(i,:),size(inter,1),1);
+  repmatResult = repmat(area(i,:),size(inter,1),1); %ED a matrix full of "area(i,:)"
+  o = inter ./ repmatResult; %ED - elementwise division of actual areas by "area(i,:)"
   o = max(o,[],2);
   I(o > overlap) = [];
 end  

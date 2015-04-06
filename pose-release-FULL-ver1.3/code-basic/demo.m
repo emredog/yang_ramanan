@@ -36,9 +36,10 @@ for i = 1:length(imlist)
             fprintf('No detection after %.3f seconds for %s\n',dettime, imlist(i).name);
             imwrite(im, ['images/result_' imlist(i).name(1:end-4) '.jpg']);
         else
-            boxes = nms(boxes, .1); % nonmaximal suppression
+            [boxes, indexOfMax] = nms(boxes, .1); % nonmaximal suppression
+            scores = scores(indexOfMax,:);
             colorset = {'g','g','y','m','m','m','m','y','y','y','r','r','r','r','y','c','c','c','c','y','y','y','b','b','b','b'};
-            showboxes(im, boxes(1,:),colorset); % show the best detection
+            showboxes(im, boxes(1,:),colorset, scores); % show the best detection
             %showboxes(im, boxes,colorset);  % show all detections
             fprintf('detection took %.3f seconds for %s\n',dettime, imlist(i).name);
             %disp('press any key to continue');

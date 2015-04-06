@@ -1,4 +1,10 @@
-function showboxes(im, boxes, partcolor)
+function showboxes(im, boxes, partcolor, scores)
+
+if nargin < 4
+    isShowScores = false;
+else
+    isShowScores = true;
+end
 
 imagesc(im); axis image; axis off;
 if ~isempty(boxes)
@@ -13,6 +19,10 @@ if ~isempty(boxes)
 	for p = 1:size(xy,2)
 		line([x1(:,p) x1(:,p) x2(:,p) x2(:,p) x1(:,p)]',[y1(:,p) y2(:,p) y2(:,p) y1(:,p) y1(:,p)]',...
 		'color',partcolor{p},'linewidth',2);
+    
+        if isShowScores
+            text(x1(1,p), y1(1,p) + 3 , num2str(scores(1,p)), 'color',partcolor{p});
+        end
 	end
 end
 drawnow;
