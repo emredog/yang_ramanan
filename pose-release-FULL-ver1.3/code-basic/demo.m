@@ -8,7 +8,8 @@ end
 compile;
 
 % load and display model
-load('PARSE_model');
+% load('PARSE_model_modified2'); %mParse_model_modified2 has interval=2
+load('PARSE_model_modified'); %mParse_model_modified has interval=1
 %visualizemodel(model);
 %disp('model template visualization');
 %disp('press any key to continue');
