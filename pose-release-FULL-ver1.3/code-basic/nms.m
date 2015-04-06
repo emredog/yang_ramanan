@@ -35,20 +35,21 @@ for p = 1:numpart
   area(:,p) = (x2(:,p)-x1(:,p)+1) .* (y2(:,p)-y1(:,p)+1);
 end
 % compute the biggest boxes covering detection
-rx1 = min(x1,[],2);
-ry1 = min(y1,[],2);
-rx2 = max(x2,[],2);
-ry2 = max(y2,[],2);
-rarea = (rx2-rx1+1) .* (ry2-ry1+1);
+%ED - for each detection candidate, define the largest bounding box
+minX1 = min(x1,[],2); 
+minY1 = min(y1,[],2);
+maxX2 = max(x2,[],2);
+maxY2 = max(y2,[],2);
+rarea = (maxX2-minX1+1) .* (maxY2-minY1+1);
 % combine parts and biggest covering boxes
-x1 = [x1 rx1];
-y1 = [y1 ry1];
-x2 = [x2 rx2];
-y2 = [y2 ry2];
+x1 = [x1 minX1];
+y1 = [y1 minY1];
+x2 = [x2 maxX2];
+y2 = [y2 maxY2];
 area = [area rarea];
 
-s = boxes(:,end);
-[vals, I] = sort(s);
+rootScores = boxes(:,end);
+[vals, I] = sort(rootScores);
 pick = [];
 while ~isempty(I)
   last = length(I);

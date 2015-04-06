@@ -30,7 +30,7 @@ for i = 1:length(imlist)
         
         % call detect function
         tic;
-        boxes = detect_fast(im, model, min(model.thresh,-1));
+        [boxes, scores] = detect_fast(im, model, min(model.thresh,-1));
         dettime = toc; % record cpu time
         if isempty(boxes)
             fprintf('No detection after %.3f seconds for %s\n',dettime, imlist(i).name);
