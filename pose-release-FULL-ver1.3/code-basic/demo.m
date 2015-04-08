@@ -24,7 +24,7 @@ imlist = dir('images/*.jpg');
 allScores = zeros(100, 26);
 for i = 1:length(imlist)
     % load and display image
-    im = imread(['images/' imlist(i).name]);
+    im = imread(['images/' imlist(i).name]);    
     clf; imagesc(im); axis image; axis off; drawnow;
     
     [h, w, channels] = size(im);
@@ -40,6 +40,9 @@ for i = 1:length(imlist)
         else
             [boxes, indexOfMax] = nms(boxes, .1); % nonmaximal suppression
             scores = scores(indexOfMax,:);
+            % ED - record scores for each part and each image
+            allScores(i,:) = scores(1,:);
+            
             if (isfield(model, 'Ri'))
                 Ri = scores > model.Ri;
             else
@@ -51,7 +54,7 @@ for i = 1:length(imlist)
             %showboxes(im, boxes,colorset);  % show all detections
             fprintf('detection took %.3f seconds for %s\n',dettime, imlist(i).name);
             %disp('press any key to continue');
-            saveas(gcf, ['images/result_' imlist(i).name(1:end-4) '.jpg'] ,'jpg');
+            %saveas(gcf, ['images/result_' imlist(i).name(1:end-4) '.jpg'] ,'jpg');
         end
         
         %pause;
@@ -83,5 +86,5 @@ for i = 1:length(imlist)
     end
     
 end
-
+csvwrite('allScores.csv', allScores);
 disp('done');
