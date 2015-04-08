@@ -19,6 +19,7 @@ levels   = 1:length(pyra.feat);
 % Cache various statistics derived from model
 [components,filters,resp] = modelcomponents(model,pyra);
 boxes = zeros(10000,length(components{1})*4+2);
+scores = zeros(10000, length(components{1})); % ED - preallocation makes it faster (instead of dynamic allocation)
 cnt   = 0;
 
 % Iterate over scales and components,
@@ -64,10 +65,12 @@ for rlevel = levels,
     [Y,X] = find(rscore >= thresh); %ED - finds indices of rscore elements that are >= threshold, let's say there are 250 candidates:
     if length(X) > 1,
       I   = (X-1)*size(rscore,1) + Y;
-      [box, scores] = backtrack(X,Y,Ik(I),parts,pyra); %ED - this function backtrack a single root candidate until it reaches the leaf
-      %ED - added "scores"
+      [box, scoresforThisLevel] = backtrack(X,Y,Ik(I),parts,pyra); %ED - this function backtrack a single root candidate until it reaches the leaf
       i   = cnt+1:cnt+length(I);
       boxes(i,:) = [box repmat(c,length(I),1) rscore(I)];
+      %ED - added "scores"
+      scores(i,:) = scoresforThisLevel;
+     
       cnt = i(end);
     end
   end

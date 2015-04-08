@@ -1,9 +1,9 @@
-function showboxes(im, boxes, partcolor, Ri, showScores, scores)
+function showboxes(im, boxes, partcolor, ri, showScores, scores)
 
 numparts = length(partcolor);
 
 if nargin < 4
-    Ri = ones(numparts);
+    ri = ones(numparts); % ED - ones means "show all"
 end
 
 if nargin < 5
@@ -29,7 +29,7 @@ if ~isempty(boxes)
     x2 = xy(:,:,3);
     y2 = xy(:,:,4);
     for p = 1:size(xy,2)
-        if Ri(p)
+        if ri(p)
             line([x1(:,p) x1(:,p) x2(:,p) x2(:,p) x1(:,p)]',[y1(:,p) y2(:,p) y2(:,p) y1(:,p) y1(:,p)]',...
                 'color',partcolor{p},'linewidth',2);
             
