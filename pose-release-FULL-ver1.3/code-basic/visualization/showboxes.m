@@ -32,7 +32,7 @@ if ~isempty(boxes)
         if ri(p)
             line([x1(:,p) x1(:,p) x2(:,p) x2(:,p) x1(:,p)]',[y1(:,p) y2(:,p) y2(:,p) y1(:,p) y1(:,p)]',...
                 'color',partcolor{p},'linewidth',2);
-            
+            text(x1(1,p), y1(1,p) + 3 , num2str(p), 'color', 'w');
             if isShowScores
                 text(x1(1,p), y1(1,p) + 3 , num2str(scores(1,p)), 'color',partcolor{p});
             end

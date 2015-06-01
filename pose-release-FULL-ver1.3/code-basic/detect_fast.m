@@ -12,7 +12,7 @@ function [boxes, scores] = detect_fast(im, model, thresh)
 tic;
 pyra     = featpyramid(im,model); %ED - Calculates HOG features for different scales
 pyratime = toc;
-fprintf('Pyramid constructed in %.3f seconds\n',pyratime);
+%fprintf('Pyramid constructed in %.3f seconds\n',pyratime);
 interval = model.interval;
 levels   = 1:length(pyra.feat);
 
@@ -35,6 +35,8 @@ for rlevel = levels,
       level = rlevel-parts(k).scale*interval;
       if isempty(resp{level}),
         resp{level} = fconv(pyra.feat{level},filters,1,length(filters)); %ED - Calculates HOG responses of pyramid against the trained model.
+        % resp{level} ==> for all part types (26*6 = 156) for this level,
+        % each pixel has a scalar response (like a heat map)
       end
       for fi = 1:length(f)
         parts(k).score(:,:,fi) = resp{level}{f(fi)};
@@ -49,8 +51,8 @@ for rlevel = levels,
     for k = numparts:-1:2,
       par = parts(k).parent;
       [msg,parts(k).Ix,parts(k).Iy,parts(k).Ik] = passmsg(parts(k),parts(par)); %ED - Calculate deformation score between k and k-1(=par, parent of k) --> msg
-                                                                                %ED - k.Ix and k.Iy contains, for each (pi,ti) of k, potential pi of k-1
-                                                                                %ED - k.Ik contains, for each (pi,ti) of k, potential ti of k-1
+                                                                                %ED - k.Ix and k.Iy contains, for each (pi,ti) of k, potential pi of par
+                                                                                %ED - k.Ik contains, for each (pi,ti) of k, potential ti of par
       parts(par).score = parts(par).score + msg; %ED - score of PARENT is updated with msg (deformation score between k and k-1(=par, parent of k))
     end
     %passmsgTime = toc;
@@ -58,7 +60,7 @@ for rlevel = levels,
 
     % Add bias to root score
     parts(1).score = parts(1).score + parts(1).b; %ED - Bias score is from model components, ie, a learned value
-    [rscore Ik]    = max(parts(1).score,[],3);    %ED - For the root part, select best ti for every pi, based on obtained score.
+    [rscore, Ik]    = max(parts(1).score,[],3);    %ED - For the root part, select best ti for every pi, based on obtained score.
 
     % Walk back down tree following pointers
     %thresh = -100.0;
@@ -133,14 +135,14 @@ function [components,filters,resp] = modelcomponents(model,pyra)
 % (1) Apply distance transform
 % (2) Shift by anchor position of part wrt parent
 % (3) Downsample if necessary
-function [score,Ix,Iy,Ik] = passmsg(child,parent)
+function [score,Ix,Iy,Ik] = passmsg(child,parent) % ED - This function will run for each part (26 times)
   INF = 1e10;
   K   = length(child.filterid);
   Ny  = size(parent.score,1);
   Nx  = size(parent.score,2);  
   [Ix0,Iy0,score0] = deal(zeros([Ny Nx K]));
 
-  for k = 1:K
+  for k = 1:K % ED - That's why we iterate over 6 types
     [score0(:,:,k),Ix0(:,:,k),Iy0(:,:,k)] = shiftdt(child.score(:,:,k), child.w(1,k), child.w(2,k), child.w(3,k), child.w(4,k),child.startx(k),child.starty(k),Nx,Ny,child.step);
   end
   %ED - shiftdt makes -some- distance transform to rapidly calculate the
